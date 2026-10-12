@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Gameshow Quiz: Vocabulary Master</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka+One&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Chakra+Petch:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      background: radial-gradient(ellipse at top, #1e1b4b 0%, #0f172a 50%, #030712 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .font-arcade { font-family: 'Bungee', cursive; }
+    .font-game { font-family: 'Fredoka One', cursive; }
+    .font-hud { font-family: 'Chakra Petch', sans-serif; }
+
+    /* Studio Neon Lights and Stage Aesthetics */
+    .gameshow-border {
+      box-shadow: 0 0 35px rgba(234, 179, 8, 0.45), inset 0 0 15px rgba(250, 204, 21, 0.2);
+    }
+    .neon-cyan {
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), inset 0 0 10px rgba(34, 211, 238, 0.3);
+    }
+    .neon-magenta {
+      box-shadow: 0 0 25px rgba(217, 70, 239, 0.5), inset 0 0 10px rgba(232, 121, 249, 0.3);
+    }
+
+    /* Option Button 3D Hover & Click Dynamics */
+    .gameshow-btn {
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5), 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    }
+    .gameshow-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.5), 0 14px 20px -3px rgba(0, 0, 0, 0.5);
+    }
+    .gameshow-btn:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5), 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Correct and Wrong Button Animations */
+    @keyframes pulseCorrect {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 30px #22c55e; }
+      50% { transform: scale(1.03); box-shadow: 0 0 50px #4ade80; }
+    }
+    .btn-correct {
+      background: linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important;
+      border-color: #86efac !important;
+      color: #ffffff !important;
+      animation: pulseCorrect 0.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes shakeWrong {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .btn-wrong {
+      background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%) !important;
+      border-color: #fca5a5 !important;
+      color: #ffffff !important;
+      animation: shakeWrong 0.4s ease-in-out;
+    }
+
+    /* Marquee Flashing Bulbs */
+    @keyframes bulbBlink {
+      0%, 100% { opacity: 0.35; filter: drop-shadow(0 0 2px #facc15); }
+      50% { opacity: 1; filter: drop-shadow(0 0 8px #fde047); }
+    }
+    .bulb { animation: bulbBlink 1.4s infinite ease-in-out; }
+    .bulb:nth-child(even) { animation-delay: 0.7s; }
+  </style>
+</head>
+<body class="text-slate-100 flex flex-col justify-between p-2.5 sm:p-4">
+
+  <!-- Top Studio Broadcast Bar -->
+  <header class="max-w-5xl w-full mx-auto bg-slate-900/90 backdrop-blur-md border-2 border-amber-400/50 rounded-3xl p-3 sm:p-4 shadow-2xl mb-3 gameshow-border relative z-20">
+    
+    <!-- Decorative Marquee Lights Header Row -->
+    <div class="flex justify-between items-center px-2 pb-2 mb-2 border-b border-slate-800 text-xs sm:text-sm">
+      <div class="flex items-center gap-1.5">
+        <span class="w-3 h-3 rounded-full bg-amber-400 bulb inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-cyan-400 bulb inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-rose-400 bulb inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-emerald-400 bulb inline-block"></span>
+        <span class="font-arcade tracking-widest text-amber-300 ml-1 text-xs sm:text-sm">VOCABULARY GAMESHOW ARENA</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleSound()" id="sound-btn" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold border border-slate-700 transition">
+          <span id="sound-icon">🔊 Sound ON</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Contestant Profile & Scoreboard -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Contestant Identity Badge -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-3xl shadow-lg border-2 border-amber-200">
+          🏆
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-xl font-black font-arcade text-amber-300 tracking-wider">
+              GAMESHOW QUIZ
+            </h1>
+            <span id="hud-round-pill" class="px-2.5 py-0.5 bg-cyan-500/20 text-cyan-300 border border-cyan-400/50 rounded-full text-[11px] font-bold uppercase tracking-wider font-hud">
+              ROUND 1: GAP-FILL
+            </span>
+          </div>
+          <p class="text-xs text-slate-300 mt-0.5">
+            Contestant: <strong id="hud-name-display" class="text-amber-400 font-game text-sm">Guest Star</strong> 
+            <span class="text-slate-500">•</span>
+            Group: <strong id="hud-group-display" class="text-cyan-300 font-game text-sm">Group 1</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Live Score & Streak Display -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="bg-slate-950/85 px-3 py-1.5 rounded-2xl border border-slate-800 text-center min-w-[75px]">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block tracking-wider font-hud">Score</span>
+          <span id="hud-score" class="font-hud font-black text-lg sm:text-2xl text-amber-400">0</span>
+        </div>
+        <div class="bg-slate-950/85 px-3 py-1.5 rounded-2xl border border-slate-800 text-center min-w-[75px]">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block tracking-wider font-hud">Streak</span>
+          <span id="hud-streak" class="font-hud font-black text-lg sm:text-2xl text-emerald-400">0x</span>
+        </div>
+        <div class="bg-slate-950/85 px-3 py-1.5 rounded-2xl border border-slate-800 text-center min-w-[75px]">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block tracking-wider font-hud">Question</span>
+          <span id="hud-qnum" class="font-hud font-black text-lg sm:text-2xl text-cyan-400">1 / 20</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdown Timer Bar -->
+    <div class="mt-3">
+      <div class="flex justify-between items-center text-[11px] font-bold font-hud text-slate-300 mb-1">
+        <span class="flex items-center gap-1">⏱️ QUESTION TIMER: <span id="timer-seconds" class="text-amber-400 text-sm">30s</span></span>
+        <span id="multiplier-tag" class="text-purple-300 font-black tracking-wider">1x POINTS</span>
+      </div>
+      <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
+        <div id="timer-bar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-all duration-300" style="width: 100%;"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Stage Arena -->
+  <main class="max-w-5xl w-full mx-auto flex-1 flex flex-col justify-center relative">
+
+    <!-- Lifeline Power-Up Controls Bar -->
+    <div class="flex items-center justify-center gap-2 sm:gap-4 mb-3" id="lifelines-bar">
+      <button onclick="useLifeline('5050')" id="ll-5050" class="px-3 sm:px-4 py-2 bg-indigo-950/80 hover:bg-indigo-900 border-2 border-indigo-500/60 rounded-2xl text-xs sm:text-sm font-bold font-hud text-indigo-200 transition shadow flex items-center gap-1.5 active:scale-95">
+        <span>🌓</span> 50:50 Lifeline <span class="text-[10px] bg-indigo-800 px-1.5 py-0.5 rounded-full" id="count-5050">1</span>
+      </button>
+      <button onclick="useLifeline('time')" id="ll-time" class="px-3 sm:px-4 py-2 bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-500/60 rounded-2xl text-xs sm:text-sm font-bold font-hud text-emerald-200 transition shadow flex items-center gap-1.5 active:scale-95">
+        <span>⏳</span> +15s Extra Time <span class="text-[10px] bg-emerald-800 px-1.5 py-0.5 rounded-full" id="count-time">1</span>
+      </button>
+      <button onclick="useLifeline('double')" id="ll-double" class="px-3 sm:px-4 py-2 bg-purple-950/80 hover:bg-purple-900 border-2 border-purple-500/60 rounded-2xl text-xs sm:text-sm font-bold font-hud text-purple-200 transition shadow flex items-center gap-1.5 active:scale-95">
+        <span>⚡</span> 2x Double Score <span class="text-[10px] bg-purple-800 px-1.5 py-0.5 rounded-full" id="count-double">1</span>
+      </button>
+    </div>
+
+    <!-- Central Gameshow Question Spotlight Board -->
+    <div class="bg-slate-900/95 border-4 border-amber-400 rounded-3xl p-5 sm:p-8 shadow-2xl relative gameshow-border text-center mb-4">
+      
+      <!-- Stage Lights Floating Badges -->
+      <div class="flex items-center justify-between mb-2">
+        <span id="question-category-tag" class="px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/40 rounded-full text-xs font-bold uppercase tracking-wider font-hud">
+          Part I • Question 1 of 10: Sentence Gap-Fill
+        </span>
+        <span id="points-potential" class="text-xs font-black text-emerald-400 font-hud tracking-wider">
+          +100 PTS
+        </span>
+      </div>
+
+      <!-- Question Text Prompt -->
+      <h2 id="question-text" class="text-xl sm:text-2xl md:text-3xl font-black text-amber-200 font-game px-2 py-4 leading-relaxed min-h-[90px] flex items-center justify-center">
+        "Loading gameshow question..."
+      </h2>
+
+      <!-- Visual Context Pill -->
+      <div id="hint-strip" class="text-xs sm:text-sm text-cyan-300 font-semibold bg-slate-950/70 py-1.5 px-4 rounded-xl inline-block border border-cyan-500/30">
+        Choose the best word to complete the blank
+      </div>
+    </div>
+
+    <!-- Interactive 4-Option Buzzers (2x2 Grid) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-4xl mx-auto w-full" id="options-grid">
+      
+      <!-- Buzzer A -->
+      <button onclick="chooseAnswer(0)" id="btn-opt-0" class="gameshow-btn p-4 sm:p-5 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 border-2 border-cyan-400/50 rounded-2xl text-left flex items-center gap-3 transition">
+        <span class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 font-black font-arcade text-lg sm:text-xl flex items-center justify-center shrink-0">
+          A
+        </span>
+        <span class="text-base sm:text-xl font-bold font-game text-white tracking-wide truncate" id="text-opt-0">
+          Option A
+        </span>
+      </button>
+
+      <!-- Buzzer B -->
+      <button onclick="chooseAnswer(1)" id="btn-opt-1" class="gameshow-btn p-4 sm:p-5 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 border-2 border-amber-400/50 rounded-2xl text-left flex items-center gap-3 transition">
+        <span class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/40 font-black font-arcade text-lg sm:text-xl flex items-center justify-center shrink-0">
+          B
+        </span>
+        <span class="text-base sm:text-xl font-bold font-game text-white tracking-wide truncate" id="text-opt-1">
+          Option B
+        </span>
+      </button>
+
+      <!-- Buzzer C -->
+      <button onclick="chooseAnswer(2)" id="btn-opt-2" class="gameshow-btn p-4 sm:p-5 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 border-2 border-fuchsia-400/50 rounded-2xl text-left flex items-center gap-3 transition">
+        <span class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-400/40 font-black font-arcade text-lg sm:text-xl flex items-center justify-center shrink-0">
+          C
+        </span>
+        <span class="text-base sm:text-xl font-bold font-game text-white tracking-wide truncate" id="text-opt-2">
+          Option C
+        </span>
+      </button>
+
+      <!-- Buzzer D -->
+      <button onclick="chooseAnswer(3)" id="btn-opt-3" class="gameshow-btn p-4 sm:p-5 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 border-2 border-emerald-400/50 rounded-2xl text-left flex items-center gap-3 transition">
+        <span class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-black font-arcade text-lg sm:text-xl flex items-center justify-center shrink-0">
+          D
+        </span>
+        <span class="text-base sm:text-xl font-bold font-game text-white tracking-wide truncate" id="text-opt-3">
+          Option D
+        </span>
+      </button>
+    </div>
+
+    <!-- Active Question Explanatory Toast -->
+    <div id="feedback-toast" class="mt-3 text-center transition-all duration-300 min-h-[30px] font-bold text-sm"></div>
+  </main>
+
+  <!-- Contestant Entry Modal (Cover Screen) -->
+  <div id="start-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-4 border-amber-400 max-w-lg w-full rounded-3xl p-5 sm:p-7 text-center shadow-2xl space-y-4 gameshow-border relative">
+      
+      <!-- Big Shining Trophy -->
+      <div class="text-5xl animate-bounce">🎙️</div>
+
+      <h2 class="text-2xl sm:text-3xl font-black font-arcade text-amber-300 tracking-wider">
+        GAMESHOW QUIZ!
+      </h2>
+      <p class="text-xs sm:text-sm text-cyan-300 font-semibold">
+        Academic Vocabulary Grand Championship
+      </p>
+
+      <!-- Target Words Marquee Pill -->
+      <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 text-left text-xs space-y-1">
+        <span class="text-[10px] uppercase font-bold text-amber-400 font-hud tracking-wider block">
+          10 Target Academic Words:
+        </span>
+        <p class="text-slate-300 font-mono text-[11px] leading-relaxed">
+          consistent • enhance • justified • objective • statistical • consumption • fundamental • majority • phenomenon • sustain
+        </p>
+      </div>
+
+      <!-- Registration Form: Name & Group -->
+      <div class="space-y-3 text-left">
+        <div>
+          <label for="input-contestant-name" class="text-xs uppercase font-bold text-amber-400 tracking-wider block font-hud mb-1">
+            Contestant Name: <span class="text-rose-400">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="input-contestant-name" 
+            placeholder="e.g. Salim Al-Harthy" 
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white font-bold placeholder-slate-500 focus:outline-none focus:border-amber-400 transition text-sm"
+          >
+        </div>
+
+        <div>
+          <label for="input-contestant-group" class="text-xs uppercase font-bold text-cyan-400 tracking-wider block font-hud mb-1">
+            Class Group / Section: <span class="text-rose-400">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="input-contestant-group" 
+            placeholder="e.g. Group 14 (GE3)" 
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white font-bold placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm"
+          >
+        </div>
+
+        <p id="reg-warning" class="text-[11px] text-rose-400 font-bold hidden text-center">
+          ⚠️ Please enter both your Name and Group to take the Gameshow podium!
+        </p>
+      </div>
+
+      <!-- Round Roadmap -->
+      <div class="grid grid-cols-2 gap-2 text-left text-xs pt-1">
+        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-cyan-500/30">
+          <span class="text-[10px] font-bold text-cyan-300 uppercase block font-hud">Round 1 (Q1–10)</span>
+          <span class="text-slate-300 font-semibold text-[11px]">Sentence Gap-Fill</span>
+        </div>
+        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-fuchsia-500/30">
+          <span class="text-[10px] font-bold text-fuchsia-300 uppercase block font-hud">Round 2 (Q11–20)</span>
+          <span class="text-slate-300 font-semibold text-[11px]">Synonym Showdown</span>
+        </div>
+      </div>
+
+      <button onclick="startGameshow()" class="w-full py-3.5 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-600 hover:from-amber-300 hover:to-yellow-500 text-slate-950 font-black text-base sm:text-lg rounded-2xl shadow-xl transition active:scale-95 font-hud tracking-wider">
+        STEP UP TO THE PODIUM ▶
+      </button>
+    </div>
+  </div>
+
+  <!-- Halfway Round Checkpoint Modal -->
+  <div id="round-transition-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-4 border-cyan-400 max-w-lg w-full rounded-3xl p-5 sm:p-7 text-center shadow-2xl space-y-4 neon-cyan">
+      <div class="text-5xl animate-bounce">⚡</div>
+      
+      <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 border border-cyan-400/50 rounded-full text-xs font-bold uppercase tracking-widest inline-block font-hud">
+        Round 1 Cleared!
+      </span>
+
+      <h2 class="text-2xl sm:text-3xl font-black font-arcade text-cyan-300">
+        HALFTIME SCORE REPORT
+      </h2>
+
+      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 grid grid-cols-2 gap-3 text-left">
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold uppercase font-hud block">Contestant</span>
+          <p id="trans-contestant-name" class="text-base font-black text-amber-300 truncate">Salim</p>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold uppercase font-hud block">Group</span>
+          <p id="trans-contestant-group" class="text-base font-black text-cyan-300 truncate">Group 14</p>
+        </div>
+        <div class="col-span-2 pt-2 border-t border-slate-800 flex justify-between items-center">
+          <span class="text-xs uppercase font-bold text-slate-400 font-hud">Round 1 Points:</span>
+          <span id="trans-r1-score" class="text-2xl font-black font-hud text-emerald-400">0 pts</span>
+        </div>
+      </div>
+
+      <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+        Sensational play! Get ready for <strong>Round 2: Synonym Showdown</strong>. Match each target academic term to its exact definition!
+      </p>
+
+      <button onclick="startRoundTwo()" class="w-full py-3.5 bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-slate-950 font-black text-base sm:text-lg rounded-2xl shadow-xl transition active:scale-95 font-hud">
+        START ROUND 2: SYNONYMS ▶
+      </button>
+    </div>
+  </div>
+
+  <!-- Grand Finale Leaderboard / Result Sheet Modal -->
+  <div id="game-over-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-4 border-amber-400 max-w-xl w-full rounded-3xl p-5 sm:p-7 text-center shadow-2xl space-y-4 max-h-[92vh] flex flex-col gameshow-border">
+      
+      <!-- Confetti Cannon Trophy -->
+      <div class="text-4xl sm:text-5xl">👑</div>
+
+      <h2 class="text-2xl sm:text-3xl font-black font-arcade text-amber-400">
+        GAMESHOW COMPLETED!
+      </h2>
+
+      <!-- Official Candidate Verification Card -->
+      <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 text-left text-xs grid grid-cols-2 gap-2">
+        <div>
+          <span class="text-slate-400 uppercase font-bold block text-[10px] font-hud">Candidate Name</span>
+          <strong id="final-name" class="text-amber-300 text-sm font-game">Salim Al-Harthy</strong>
+        </div>
+        <div>
+          <span class="text-slate-400 uppercase font-bold block text-[10px] font-hud">Assigned Group</span>
+          <strong id="final-group" class="text-cyan-300 text-sm font-game">Group 14</strong>
+        </div>
+      </div>
+
+      <!-- Stat Box Badges (3-Column) -->
+      <div class="grid grid-cols-3 gap-2 text-left">
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block font-hud">Final Score</span>
+          <p id="final-score" class="text-lg sm:text-2xl font-black font-hud text-amber-400">0 pts</p>
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block font-hud">Accuracy</span>
+          <p id="final-accuracy" class="text-lg sm:text-2xl font-black font-hud text-emerald-400">0%</p>
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block font-hud">Correct Qs</span>
+          <p id="final-correct-count" class="text-lg sm:text-2xl font-black font-hud text-cyan-400">0 / 20</p>
+        </div>
+      </div>
+
+      <!-- Itemized Performance Log (Scrollable) -->
+      <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 text-left text-xs overflow-y-auto max-h-40 pr-1 space-y-1.5" id="final-answers-log">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2.5 pt-1">
+        <button onclick="window.print()" class="w-1/2 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm rounded-xl transition font-hud">
+          🖨️ Print Gameshow Record
+        </button>
+        <button onclick="restartGameshow()" class="w-1/2 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition font-hud">
+          PLAY AGAIN ↺
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 20 Complete Academic Questions (10 Gap-Fill + 10 Synonym Match)
+    const questionsDatabase = [
+      // PART I: SENTENCE GAP-FILL (Questions 1-10)
+      {
+        id: 1,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "Make-up can ________ a woman’s beauty.",
+        answer: "enhance",
+        distractors: ["sustain", "consumption", "justify"],
+        explanation: "'Enhance' means to improve or increase the quality or beauty of something."
+      },
+      {
+        id: 2,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "A man cannot ________ his breathing when he is underwater.",
+        answer: "sustain",
+        distractors: ["enhance", "consume", "justify"],
+        explanation: "'Sustain' means to maintain or keep something going over time."
+      },
+      {
+        id: 3,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "The judges were very ________ in choosing the winners of the debate.",
+        answer: "objective",
+        distractors: ["fundamental", "statistical", "consistent"],
+        explanation: "'Objective' means fair, unbiased, and not influenced by personal feelings."
+      },
+      {
+        id: 4,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "Leaders also need research and ________ data as basis for their decisions.",
+        answer: "statistical",
+        distractors: ["consistent", "fundamental", "objective"],
+        explanation: "'Statistical' refers to numerical data collected through scientific research."
+      },
+      {
+        id: 5,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "Her success ________ her parents’ belief in her intelligence and abilities.",
+        answer: "justified",
+        distractors: ["sustained", "enhanced", "consumed"],
+        explanation: "'Justified' means showed to be right, reasonable, or well-founded."
+      },
+      {
+        id: 6,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "Man’s water ________ has now reached its limit as water is not a renewable resource anymore.",
+        answer: "consumption",
+        distractors: ["phenomenon", "majority", "sustain"],
+        explanation: "'Consumption' is the act of using or utilizing resources such as water or energy."
+      },
+      {
+        id: 7,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "Shooting and dribbling are ________ skills that should be learned in playing basketball.",
+        answer: "fundamental",
+        distractors: ["objective", "statistical", "consistent"],
+        explanation: "'Fundamental' means essential, primary, and basic."
+      },
+      {
+        id: 8,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "The ________ of the children nowadays prefer online games than playing outdoors.",
+        answer: "majority",
+        distractors: ["phenomenon", "consumption", "discipline"],
+        explanation: "'Majority' means the greater number or more than half of a whole group."
+      },
+      {
+        id: 9,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "If you want to be a good public speaker, you need ________ practice in presenting in front of an audience.",
+        answer: "consistent",
+        distractors: ["statistical", "fundamental", "objective"],
+        explanation: "'Consistent' means steady, constant, and continuous over time."
+      },
+      {
+        id: 10,
+        part: 1,
+        type: "Gap-Fill",
+        prompt: "Language remains to be a ________ because nobody knows when language use began.",
+        answer: "phenomenon",
+        distractors: ["consumption", "majority", "objective"],
+        explanation: "'Phenomenon' means a remarkable fact or situation that is difficult to fully explain."
+      },
+
+      // PART II: SYNONYM MATCH (Questions 11-20)
+      {
+        id: 11,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "To be 'consistent' is to be:",
+        answer: "constant",
+        distractors: ["essential", "unemotional", "numerical"],
+        explanation: "'Consistent' is synonymous with constant, uniform, and steady."
+      },
+      {
+        id: 12,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "The 'majority' is the:",
+        answer: "greater number",
+        distractors: ["essential part", "unemotional choice", "numerical trend"],
+        explanation: "'Majority' means the larger share or greater number."
+      },
+      {
+        id: 13,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "'Consumption' also means:",
+        answer: "utilization or use",
+        distractors: ["greater number", "improve the quality", "maintain or continue"],
+        explanation: "'Consumption' represents the use, utilization, or expenditure of resources."
+      },
+      {
+        id: 14,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "To be 'objective' is to be:",
+        answer: "unemotional",
+        distractors: ["constant", "essential", "right or reasonable"],
+        explanation: "'Objective' means impartial, unbiased, and unemotional in judgment."
+      },
+      {
+        id: 15,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "To 'enhance' is to:",
+        answer: "improve the quality",
+        distractors: ["maintain or continue", "utilization or use", "numerical"],
+        explanation: "'Enhance' means to enrich, boost, or improve the quality."
+      },
+      {
+        id: 16,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "A 'phenomenon' is a:",
+        answer: "situation that is difficult to explain",
+        distractors: ["greater number", "numerical figure", "constant rule"],
+        explanation: "'Phenomenon' is an observed event or occurrence that is difficult to explain."
+      },
+      {
+        id: 17,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "'Fundamental' means:",
+        answer: "essential",
+        distractors: ["unemotional", "constant", "numerical"],
+        explanation: "'Fundamental' denotes the primary, foundational, or essential core."
+      },
+      {
+        id: 18,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "'Statistical' also means:",
+        answer: "numerical",
+        distractors: ["constant", "essential", "unemotional"],
+        explanation: "'Statistical' relates to data expressed in numbers (numerical)."
+      },
+      {
+        id: 19,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "To be 'justified' is to be:",
+        answer: "right or reasonable",
+        distractors: ["numerical", "constant", "unemotional"],
+        explanation: "'Justified' means supported by sound reason, right, or justifiable."
+      },
+      {
+        id: 20,
+        part: 2,
+        type: "Synonym Match",
+        prompt: "To 'sustain' is to:",
+        answer: "maintain or continue",
+        distractors: ["improve the quality", "greater number", "utilization or use"],
+        explanation: "'Sustain' means to support, maintain, or continue over time."
+      }
+    ];
+
+    // Gameshow State Variables
+    let contestantName = "Guest Star";
+    let contestantGroup = "Group 1";
+    let currentIndex = 0;
+    let score = 0;
+    let roundOneScore = 0;
+    let streak = 0;
+    let currentOptions = [];
+    let isQuestionActive = false;
+    let questionHistory = [];
+    let soundEnabled = true;
+
+    // Timer Dynamics
+    let timerValue = 30;
+    let timerMax = 30;
+    let timerInterval = null;
+
+    // Active Lifelines
+    let lifelines = {
+      "5050": 1,
+      "time": 1,
+      "double": 1
+    };
+    let activeMultiplier = 1;
+
+    // Web Audio Synthesizer (No external sound files required)
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, duration, type = 'sine', volume = 0.25) {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio exception:", e);
+      }
+    }
+
+    function soundBuzzerCorrect() {
+      initAudio();
+      if (!soundEnabled || !audioCtx) return;
+      playTone(523.25, 0.12, 'sine', 0.25); // C5
+      setTimeout(() => playTone(659.25, 0.12, 'sine', 0.25), 100); // E5
+      setTimeout(() => playTone(783.99, 0.25, 'sine', 0.3), 200); // G5
+      setTimeout(() => playTone(1046.50, 0.4, 'triangle', 0.35), 320); // C6 fanfare
+    }
+
+    function soundBuzzerWrong() {
+      initAudio();
+      if (!soundEnabled || !audioCtx) return;
+      playTone(200, 0.15, 'sawtooth', 0.3);
+      setTimeout(() => playTone(140, 0.35, 'sawtooth', 0.35), 120);
+    }
+
+    function soundTick() {
+      if (!soundEnabled || !audioCtx) return;
+      playTone(800, 0.04, 'sine', 0.08);
+    }
+
+    function soundLifeline() {
+      initAudio();
+      if (!soundEnabled || !audioCtx) return;
+      playTone(440, 0.08, 'triangle', 0.2);
+      setTimeout(() => playTone(880, 0.18, 'sine', 0.25), 80);
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('sound-icon').textContent = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
+    }
+
+    function startGameshow() {
+      const nameInput = document.getElementById('input-contestant-name');
+      const groupInput = document.getElementById('input-contestant-group');
+      const nameVal = nameInput.value.trim();
+      const groupVal = groupInput.value.trim();
+
+      if (!nameVal || !groupVal) {
+        document.getElementById('reg-warning').classList.remove('hidden');
+        if (!nameVal) nameInput.focus();
+        else groupInput.focus();
+        return;
+      }
+
+      document.getElementById('reg-warning').classList.add('hidden');
+      contestantName = nameVal;
+      contestantGroup = groupVal;
+
+      document.getElementById('hud-name-display').textContent = contestantName;
+      document.getElementById('hud-group-display').textContent = contestantGroup;
+      document.getElementById('final-name').textContent = contestantName;
+      document.getElementById('final-group').textContent = contestantGroup;
+
+      document.getElementById('start-modal').classList.add('hidden');
+      document.getElementById('round-transition-modal').classList.add('hidden');
+      document.getElementById('game-over-modal').classList.add('hidden');
+
+      initAudio();
+      currentIndex = 0;
+      score = 0;
+      roundOneScore = 0;
+      streak = 0;
+      questionHistory = [];
+      lifelines = { "5050": 1, "time": 1, "double": 1 };
+      updateLifelinesUI();
+
+      loadCurrentQuestion();
+    }
+
+    function loadCurrentQuestion() {
+      if (currentIndex >= questionsDatabase.length) {
+        showFinalGameOver();
+        return;
+      }
+
+      // Halftime checkpoint transition after Question 10
+      if (currentIndex === 10 && questionsDatabase[currentIndex].part === 2 && roundOneScore === 0) {
+        roundOneScore = score;
+        showRoundCheckpoint();
+        return;
+      }
+
+      isQuestionActive = true;
+      activeMultiplier = 1;
+      updateMultiplierUI();
+
+      const q = questionsDatabase[currentIndex];
+      const isRoundOne = q.part === 1;
+
+      // Update HUD
+      document.getElementById('hud-qnum').textContent = `${currentIndex + 1} / 20`;
+      document.getElementById('hud-score').textContent = score;
+      document.getElementById('hud-streak').textContent = `${streak}x`;
+      document.getElementById('hud-round-pill').textContent = isRoundOne ? "ROUND 1: GAP-FILL" : "ROUND 2: SYNONYM MATCH";
+      document.getElementById('hud-round-pill').className = `px-2.5 py-0.5 border rounded-full text-[11px] font-bold uppercase tracking-wider font-hud ${
+        isRoundOne ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50' : 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-400/50'
+      }`;
+
+      document.getElementById('question-category-tag').textContent = `Question ${currentIndex + 1} of 20 • ${isRoundOne ? 'Part I: Gap-Fill' : 'Part II: Synonym Match'}`;
+      document.getElementById('question-text').textContent = q.prompt;
+      document.getElementById('hint-strip').textContent = isRoundOne 
+        ? "Choose the academic target word that fits the blank perfectly" 
+        : "Match the word to its accurate synonym or definition";
+      document.getElementById('points-potential').textContent = "+100 PTS";
+
+      document.getElementById('feedback-toast').textContent = "";
+      document.getElementById('feedback-toast').className = "mt-3 text-center transition-all duration-300 min-h-[30px] font-bold text-sm text-slate-400";
+
+      // Prepare 4 randomized options (1 Correct + 3 Distractors)
+      const shuffledOptions = [q.answer, ...q.distractors].sort(() => Math.random() - 0.5);
+      currentOptions = shuffledOptions;
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`btn-opt-${i}`);
+        const txt = document.getElementById(`text-opt-${i}`);
+        btn.disabled = false;
+        btn.classList.remove('btn-correct', 'btn-wrong', 'opacity-30', 'pointer-events-none');
+        txt.textContent = shuffledOptions[i];
+      }
+
+      startQuestionTimer();
+    }
+
+    function startQuestionTimer() {
+      clearInterval(timerInterval);
+      timerValue = 30;
+      timerMax = 30;
+      updateTimerUI();
+
+      timerInterval = setInterval(() => {
+        if (!isQuestionActive) {
+          clearInterval(timerInterval);
+          return;
+        }
+
+        timerValue--;
+        updateTimerUI();
+
+        if (timerValue <= 5 && timerValue > 0) {
+          soundTick();
+        }
+
+        if (timerValue <= 0) {
+          clearInterval(timerInterval);
+          handleTimeExpired();
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      document.getElementById('timer-seconds').textContent = `${timerValue}s`;
+      const pct = Math.max(0, (timerValue / timerMax) * 100);
+      document.getElementById('timer-bar').style.width = `${pct}%`;
+    }
+
+    function chooseAnswer(selectedOptionIndex) {
+      if (!isQuestionActive) return;
+      isQuestionActive = false;
+      clearInterval(timerInterval);
+
+      const q = questionsDatabase[currentIndex];
+      const selectedWord = currentOptions[selectedOptionIndex];
+      const isCorrect = selectedWord === q.answer;
+      const chosenBtn = document.getElementById(`btn-opt-${selectedOptionIndex}`);
+
+      // Disable all buzzers
+      for (let i = 0; i < 4; i++) {
+        document.getElementById(`btn-opt-${i}`).disabled = true;
+      }
+
+      if (isCorrect) {
+        soundBuzzerCorrect();
+        chosenBtn.classList.add('btn-correct');
+        streak++;
+
+        // Base 100 pts + streak bonus + double lifeline multiplier
+        const basePoints = 100;
+        const streakBonus = streak > 1 ? (streak - 1) * 20 : 0;
+        const earnedPoints = (basePoints + streakBonus) * activeMultiplier;
+        score += earnedPoints;
+
+        document.getElementById('hud-score').textContent = score;
+        document.getElementById('hud-streak').textContent = `${streak}x`;
+
+        const toast = document.getElementById('feedback-toast');
+        toast.className = "mt-3 text-center transition-all duration-300 min-h-[30px] font-bold text-base text-emerald-400";
+        toast.textContent = `⭐ CORRECT! +${earnedPoints} PTS! ${q.explanation}`;
+
+        questionHistory.push({
+          qNum: currentIndex + 1,
+          prompt: q.prompt,
+          correctAnswer: q.answer,
+          selectedAnswer: selectedWord,
+          wasCorrect: true,
+          pointsEarned: earnedPoints
+        });
+
+        setTimeout(() => {
+          currentIndex++;
+          loadCurrentQuestion();
+        }, 1400);
+
+      } else {
+        soundBuzzerWrong();
+        chosenBtn.classList.add('btn-wrong');
+        streak = 0;
+        document.getElementById('hud-streak').textContent = `0x`;
+
+        // Highlight the correct answer
+        for (let i = 0; i < 4; i++) {
+          if (currentOptions[i] === q.answer) {
+            document.getElementById(`btn-opt-${i}`).classList.add('btn-correct');
+          }
+        }
+
+        const toast = document.getElementById('feedback-toast');
+        toast.className = "mt-3 text-center transition-all duration-300 min-h-[30px] font-bold text-base text-rose-400";
+        toast.textContent = `✖ INCORRECT! Correct answer: "${q.answer}". ${q.explanation}`;
+
+        questionHistory.push({
+          qNum: currentIndex + 1,
+          prompt: q.prompt,
+          correctAnswer: q.answer,
+          selectedAnswer: selectedWord,
+          wasCorrect: false,
+          pointsEarned: 0
+        });
+
+        setTimeout(() => {
+          currentIndex++;
+          loadCurrentQuestion();
+        }, 1800);
+      }
+    }
+
+    function handleTimeExpired() {
+      if (!isQuestionActive) return;
+      isQuestionActive = false;
+      soundBuzzerWrong();
+
+      const q = questionsDatabase[currentIndex];
+      streak = 0;
+      document.getElementById('hud-streak').textContent = `0x`;
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById(`btn-opt-${i}`);
+        btn.disabled = true;
+        if (currentOptions[i] === q.answer) {
+          btn.classList.add('btn-correct');
+        }
+      }
+
+      const toast = document.getElementById('feedback-toast');
+      toast.className = "mt-3 text-center transition-all duration-300 min-h-[30px] font-bold text-base text-amber-400";
+      toast.textContent = `⏰ TIME EXPIRED! The correct answer was "${q.answer}".`;
+
+      questionHistory.push({
+        qNum: currentIndex + 1,
+        prompt: q.prompt,
+        correctAnswer: q.answer,
+        selectedAnswer: "TIME EXPIRED",
+        wasCorrect: false,
+        pointsEarned: 0
+      });
+
+      setTimeout(() => {
+        currentIndex++;
+        loadCurrentQuestion();
+      }, 1800);
+    }
+
+    function useLifeline(type) {
+      if (!isQuestionActive || lifelines[type] <= 0) return;
+      lifelines[type]--;
+      updateLifelinesUI();
+      soundLifeline();
+
+      const q = questionsDatabase[currentIndex];
+
+      if (type === '5050') {
+        let removedCount = 0;
+        for (let i = 0; i < 4; i++) {
+          if (currentOptions[i] !== q.answer && removedCount < 2) {
+            const btn = document.getElementById(`btn-opt-${i}`);
+            btn.classList.add('opacity-30', 'pointer-events-none');
+            btn.disabled = true;
+            removedCount++;
+          }
+        }
+      } else if (type === 'time') {
+        timerValue += 15;
+        timerMax += 15;
+        updateTimerUI();
+      } else if (type === 'double') {
+        activeMultiplier = 2;
+        updateMultiplierUI();
+      }
+    }
+
+    function updateMultiplierUI() {
+      const tag = document.getElementById('multiplier-tag');
+      const pointsTag = document.getElementById('points-potential');
+      if (activeMultiplier === 2) {
+        tag.textContent = "⚡ 2X DOUBLE POINTS ACTIVE!";
+        tag.className = "text-amber-400 font-black tracking-wider animate-pulse";
+        pointsTag.textContent = "+200 PTS";
+      } else {
+        tag.textContent = "1X POINTS";
+        tag.className = "text-purple-300 font-black tracking-wider";
+        pointsTag.textContent = "+100 PTS";
+      }
+    }
+
+    function updateLifelinesUI() {
+      document.getElementById('count-5050').textContent = lifelines['5050'];
+      document.getElementById('count-time').textContent = lifelines['time'];
+      document.getElementById('count-double').textContent = lifelines['double'];
+
+      document.getElementById('ll-5050').disabled = lifelines['5050'] <= 0;
+      document.getElementById('ll-time').disabled = lifelines['time'] <= 0;
+      document.getElementById('ll-double').disabled = lifelines['double'] <= 0;
+
+      if (lifelines['5050'] <= 0) document.getElementById('ll-5050').classList.add('opacity-40');
+      if (lifelines['time'] <= 0) document.getElementById('ll-time').classList.add('opacity-40');
+      if (lifelines['double'] <= 0) document.getElementById('ll-double').classList.add('opacity-40');
+    }
+
+    function showRoundCheckpoint() {
+      document.getElementById('trans-contestant-name').textContent = contestantName;
+      document.getElementById('trans-contestant-group').textContent = contestantGroup;
+      document.getElementById('trans-r1-score').textContent = `${roundOneScore} pts`;
+      document.getElementById('round-transition-modal').classList.remove('hidden');
+    }
+
+    function startRoundTwo() {
+      document.getElementById('round-transition-modal').classList.add('hidden');
+      loadCurrentQuestion();
+    }
+
+    function showFinalGameOver() {
+      isQuestionActive = false;
+      clearInterval(timerInterval);
+
+      const totalCorrect = questionHistory.filter(h => h.wasCorrect).length;
+      const accuracy = Math.round((totalCorrect / 20) * 100);
+
+      document.getElementById('final-name').textContent = contestantName;
+      document.getElementById('final-group').textContent = contestantGroup;
+      document.getElementById('final-score').textContent = `${score} pts`;
+      document.getElementById('final-accuracy').textContent = `${accuracy}%`;
+      document.getElementById('final-correct-count').textContent = `${totalCorrect} / 20`;
+
+      const logContainer = document.getElementById('final-answers-log');
+      logContainer.innerHTML = `
+        <div class="text-[10px] uppercase font-bold text-slate-400 font-hud tracking-wider mb-1">
+          Complete Gameshow Question Log (20 Items):
+        </div>
+      `;
+
+      questionHistory.forEach(item => {
+        const row = document.createElement('div');
+        row.className = `p-2 rounded-xl border text-[11px] ${
+          item.wasCorrect 
+            ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200" 
+            : "bg-rose-950/40 border-rose-500/40 text-rose-200"
+        }`;
+        row.innerHTML = `
+          <div class="flex justify-between items-center font-bold mb-0.5 font-hud">
+            <span>Q${item.qNum}: ${item.wasCorrect ? "✔ " + item.correctAnswer : "✖ " + item.selectedAnswer}</span>
+            <span>${item.wasCorrect ? "+" + item.pointsEarned + " pts" : "0 pts (Ans: " + item.correctAnswer + ")"}</span>
+          </div>
+          <p class="text-[10px] text-slate-300 opacity-90">${item.prompt}</p>
+        `;
+        logContainer.appendChild(row);
+      });
+
+      document.getElementById('game-over-modal').classList.remove('hidden');
+    }
+
+    function restartGameshow() {
+      document.getElementById('game-over-modal').classList.add('hidden');
+      document.getElementById('round-transition-modal').classList.add('hidden');
+      document.getElementById('start-modal').classList.remove('hidden');
+    }
+
+    // Initialize audio listeners on user interaction
+    window.addEventListener('click', initAudio, { once: false });
+    window.addEventListener('touchstart', initAudio, { once: false });
+  </script>
+</body>
+</html>
